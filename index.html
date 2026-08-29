@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Radar FULL</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05080f;--card:#0b1220;--card2:#0f1829;--line:rgba(255,255,255,.08);--text:#f8fafc;--muted:#94a3b8;--dim:#64748b;--g:#22c55e;--r:#ef4444;--y:#eab308;--c:#22d3ee;--p:#a855f7}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Vazirmatn,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.55}
+button,input,select{font-family:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:14px}
+.head{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:18px;background:var(--card);margin-bottom:12px}
+.head h1{font-size:1.15rem;font-weight:900}
+.head p{font-size:.75rem;color:var(--muted)}
+.src{display:inline-block;margin-top:4px;font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:8px;background:rgba(34,211,238,.1);color:var(--c)}
+.src.warn{background:rgba(234,179,8,.12);color:var(--y)}
+.btn{border:none;border-radius:11px;padding:10px 16px;font-weight:800;cursor:pointer;font-size:.86rem}
+.btn-main{background:linear-gradient(135deg,#22c55e,#16a34a);color:#041016}
+.btn-ghost{background:var(--card2);border:1px solid var(--line);color:var(--text)}
+.btn:disabled{opacity:.5;cursor:wait}
+.layout{display:grid;grid-template-columns:300px 1fr 280px;gap:12px}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:10px}
+.panel h2{font-size:.88rem;font-weight:800;margin-bottom:10px}
+.field{margin-bottom:8px}
+.field label{display:block;font-size:.68rem;color:var(--muted);font-weight:700;margin-bottom:3px}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;color:var(--text);font-size:.84rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cap{text-align:center;padding:10px;border-radius:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25)}
+.cap .v{font-size:1.15rem;font-weight:900;color:var(--g)}
+.tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.tab{padding:8px 11px;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--muted);font-weight:800;cursor:pointer;font-size:.78rem}
+.tab.on{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35);color:var(--g)}
+.item{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--card2);margin-bottom:9px}
+.item.yes{border-color:rgba(34,197,94,.4)}
+.item.yes-final{border-color:rgba(34,197,94,.75);box-shadow:0 0 20px rgba(34,197,94,.1)}
+.item.maybe{border-color:rgba(234,179,8,.3)}
+.item.no{opacity:.88}
+.top{display:flex;justify-content:space-between;gap:8px}
+.name{font-weight:900;font-size:.98rem;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.name img{width:26px;height:26px;border-radius:7px;object-fit:cover}
+.verdict{font-size:.68rem;font-weight:900;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.verdict.yes{background:rgba(34,197,94,.15);color:var(--g)}
+.verdict.yes-final{background:#22c55e;color:#041016}
+.verdict.maybe{background:rgba(234,179,8,.15);color:var(--y)}
+.verdict.no{background:rgba(239,68,68,.12);color:var(--r)}
+.tag{font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:5px;background:rgba(34,211,238,.12);color:var(--c)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:8px 0}
+@media(max-width:560px){.metrics{grid-template-columns:1fr 1fr}}
+.m{background:rgba(0,0,0,.22);border-radius:9px;padding:6px;text-align:center}
+.m .l{font-size:.58rem;color:var(--dim)}.m .v{font-size:.76rem;font-weight:800;font-family:JetBrains Mono,monospace}
+.cl{font-size:.73rem;margin:2px 0;color:var(--muted)}.cl.pass{color:var(--g)}.cl.fail{color:var(--r)}.cl.manual{color:var(--y)}
+.plan{margin-top:8px;padding:8px;border-radius:10px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);font-size:.74rem}
+.final{margin-top:8px;padding:8px 10px;border-radius:10px;font-size:.8rem;font-weight:700}
+.final.yes,.final.yes-final{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3)}
+.final.maybe{background:rgba(234,179,8,.08);border:1px solid rgba(234,179,8,.25)}
+.final.no{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2)}
+.manual-box{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;padding:8px;border-radius:10px;border:1px dashed var(--line)}
+.manual-box label{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;color:var(--muted);cursor:pointer}
+.actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.actions a,.actions button{text-decoration:none;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--text);border-radius:8px;padding:6px 9px;font-size:.68rem;font-weight:700;cursor:pointer}
+.empty{text-align:center;padding:22px;color:var(--dim);font-size:.85rem}
+.status{font-size:.78rem;color:var(--muted);margin-bottom:8px}
+.note{font-size:.68rem;color:var(--dim);line-height:1.65;margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.stat{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.stat .n{font-weight:900;font-size:1.1rem}.stat .l{font-size:.65rem;color:var(--muted)}
+.wallet-item{display:flex;justify-content:space-between;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:.75rem}
+.alert{padding:10px 12px;border-radius:12px;background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.3);font-size:.8rem;margin-bottom:10px;color:var(--y)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Decision Radar FULL</h1>
+      <p>اسکالپ · عمر ≤۴۰د · استراتژی‌ها · کپی‌ترید</p>
+      <span class="src" id="srcBadge">منبع: —</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost" id="btnAuto">اتواسکن: خاموش</button>
+      <button class="btn btn-main" id="btnScan">تحلیل</button>
+    </div>
+  </div>
+  <div class="layout">
+    <aside>
+      <div class="panel">
+        <h2>💰 سرمایه</h2>
+        <div class="row2">
+          <div class="field"><label>SOL</label><input id="mySol" type="number" value="0.1" step="0.01"></div>
+          <div class="field"><label>٪ معامله</label><input id="riskPct" type="number" value="50"></div>
+        </div>
+        <div class="cap"><div class="v" id="maxPos">0.050 SOL</div></div>
+      </div>
+      <div class="panel">
+        <h2>فیلترها</h2>
+        <div class="row2">
+          <div class="field"><label>حداقل عمر (دقیقه)</label><input id="minAgeMin" type="number" value="0"></div>
+          <div class="field"><label>حداکثر عمر (دقیقه)</label><input id="maxAgeMin" type="number" value="40"></div>
+        </div>
+        <div class="field"><label>حداقل مارکت‌کپ $</label><input id="minMcap" type="number" value="3000"></div>
+        <div class="row2">
+          <div class="field"><label>افت ATH از٪</label><input id="minDip" type="number" value="0"></div>
+          <div class="field"><label>تا٪</label><input id="maxDip" type="number" value="70"></div>
+        </div>
+        <div class="field"><label>حالت نمایش</label>
+          <select id="showMode">
+            <option value="all">همه نتایج (حتی رد شده)</option>
+            <option value="soft">مردد + بله</option>
+            <option value="strict">فقط بله</option>
+          </select>
+        </div>
+        <div class="note">پیش‌فرض مارکت‌کپ ۳۰۰۰$ شد تا در پنجره ۴۰ دقیقه چیزی پیدا شود. برای سخت‌گیری ۷۰۰۰ بگذار.</div>
+      </div>
+      <div class="panel">
+        <h2>پلان خروج</h2>
+        <div class="row2">
+          <div class="field"><label>استاپ ضرر٪</label><input id="stopLoss" type="number" value="20"></div>
+          <div class="field"><label>استاپ زمانی (د)</label><input id="timeStop" type="number" value="12"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>TP1 ٪</label><input id="tp1" type="number" value="40"></div>
+          <div class="field"><label>TP2 ٪</label><input id="tp2" type="number" value="80"></div>
+        </div>
+      </div>
+    </aside>
+    <main>
+      <div id="apiAlert" class="alert" style="display:none"></div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="nRaw">0</div><div class="l">دریافتی</div></div>
+        <div class="stat"><div class="n" id="nYes" style="color:var(--g)">0</div><div class="l">بله</div></div>
+        <div class="stat"><div class="n" id="nMaybe" style="color:var(--y)">0</div><div class="l">مردد</div></div>
+        <div class="stat"><div class="n" id="nNo" style="color:var(--r)">0</div><div class="l">رد</div></div>
+      </div>
+      <div class="tabs">
+        <button class="tab on" data-f="all">همه</button>
+        <button class="tab" data-f="yes">بله</button>
+        <button class="tab" data-f="maybe">مردد</button>
+        <button class="tab" data-f="no">رد</button>
+      </div>
+      <div class="status" id="status">آماده</div>
+      <div id="list"><div class="empty">اسکن را بزن</div></div>
+    </main>
+    <aside>
+      <div class="panel">
+        <h2>کپی‌ترید</h2>
+        <div class="field"><label>آدرس ولت</label><input id="walIn" placeholder="Solana address"></div>
+        <div class="field"><label>برچسب</label><input id="walLabel" placeholder="trader1"></div>
+        <button class="btn btn-ghost" id="btnAddWal" style="width:100%;margin-bottom:8px">+ افزودن</button>
+        <div id="walBox"><div class="empty" style="padding:10px">خالی</div></div>
+      </div>
+      <div class="panel">
+        <h2>راهنما</h2>
+        <p class="note">
+          اگر Pump.fun از مرورگر بلاک شود، خودکار روی DexScreener می‌رود.<br><br>
+          کوین‌های زیر ۴۰ دقیقه اغلب MC زیر ۷۰۰۰$ دارند؛ برای دیدن لیست، MC را ۳۰۰۰ بگذار یا تب «رد» را ببین.
+        </p>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+const PUMP="https://frontend-api-v3.pump.fun";
+const DEX="https://api.dexscreener.com";
+let rows=[], filter="all", scanning=false, auto=false, autoTimer=null, source="—";
+let wallets=JSON.parse(localStorage.getItem("drf_wallets")||"[]");
+const $=id=>document.getElementById(id);
+function fmt(n){if(n==null||isNaN(n))return"—";if(n>=1e9)return(n/1e9).toFixed(2)+"B";if(n>=1e6)return(n/1e6).toFixed(2)+"M";if(n>=1e3)return(n/1e3).toFixed(1)+"K";return Math.round(+n)+""}
+function updateCap(){const s=+$("mySol").value||0,p=(+$("riskPct").value||50)/100;$("maxPos").textContent=(s*p).toFixed(3)+" SOL"}
+$("mySol").oninput=$("riskPct").oninput=updateCap;updateCap();
+function cfg(){return{
+  minMcap:+$("minMcap").value||3000,
+  minAgeMin:+$("minAgeMin").value||0,
+  maxAgeMin:+$("maxAgeMin").value||40,
+  minDip:+$("minDip").value||0,
+  maxDip:+$("maxDip").value||70,
+  stopLoss:+$("stopLoss").value||20,
+  timeStop:+$("timeStop").value||12,
+  tp1:+$("tp1").value||40,
+  tp2:+$("tp2").value||80,
+  showMode:$("showMode").value
+}}
+function getConfirms(){try{return JSON.parse(localStorage.getItem("drf_conf")||"{}")}catch{return{}}}
+function setConfirm(m,k,v){const o=getConfirms();if(!o[m])o[m]={};o[m][k]=v;localStorage.setItem("drf_conf",JSON.stringify(o))}
+
+function mapPump(c){
+  const usd=Number(c.usd_market_cap||c.market_cap_usd||0);
+  const ath=Number(c.ath_market_cap||0);
+  let dip=0; if(ath>0&&usd>0&&ath>=usd) dip=((ath-usd)/ath)*100;
+  const ageMin=c.created_timestamp?Math.max(0,Math.floor((Date.now()-c.created_timestamp)/60000)):99999;
+  return{
+    mint:c.mint,name:c.name||"?",symbol:(c.symbol||"?").toUpperCase(),image:c.image_uri||null,
+    usd,ath,dip,complete:!!c.complete,ageMin,creator:c.creator||"",
+    url:`https://pump.fun/coin/${c.mint}`,dex:`https://dexscreener.com/solana/${c.mint}`,
+    src:"pump", banned:!!c.is_banned
+  };
+}
+function mapDex(p){
+  const base=p.baseToken||{};
+  const usd=Number(p.marketCap||p.fdv||0);
+  const chg24=parseFloat(p.priceChange?.h24)||0;
+  const chg6=parseFloat(p.priceChange?.h6)||0;
+  let dip=0; if(chg24<0)dip=Math.max(dip,Math.abs(chg24)); if(chg6<0)dip=Math.max(dip,Math.abs(chg6));
+  const ageMin=p.pairCreatedAt?Math.max(0,Math.floor((Date.now()-p.pairCreatedAt)/60000)):99999;
+  return{
+    mint:base.address,name:base.name||"?",symbol:(base.symbol||"?").toUpperCase(),image:p.info?.imageUrl||null,
+    usd,ath:0,dip,complete:true,ageMin,creator:"",
+    url:p.url||`https://dexscreener.com/solana/${p.pairAddress}`,dex:`https://dexscreener.com/solana/${p.pairAddress}`,
+    src:"dex", banned:false, pair:p.pairAddress
+  };
+}
+
+function decide(c,cf){
+  const items=[];
+  const passAge=c.ageMin>=cf.minAgeMin&&c.ageMin<=cf.maxAgeMin;
+  items.push({pass:passAge,text:passAge?`عمر ${c.ageMin}د ✓ (≤${cf.maxAgeMin})`:`عمر ${c.ageMin}د خارج از پنجره`});
+  const passMc=c.usd>=cf.minMcap&&!c.banned;
+  items.push({pass:passMc,text:passMc?`MC $${fmt(c.usd)}`:`MC ضعیف $${fmt(c.usd)}`});
+  const passDip=c.dip>=cf.minDip&&c.dip<=cf.maxDip;
+  items.push({pass:passDip,text:c.ath||c.dip?`افت/پولبک ~${c.dip.toFixed(0)}٪`:`داده افت محدود`});
+  items.push({pass:null,manual:true,text:"جامعه + ضدباندل دستی"});
+  const plan=`سقف ${$("maxPos").textContent} · استاپ −${cf.stopLoss}٪ · زمان ${cf.timeStop}د · TP ${cf.tp1}% / ${cf.tp2}%`;
+  let verdict="no",label="رد",final="فیلترها پاس نشد.";
+  if(passAge&&passMc){
+    if(passDip || cf.minDip===0){
+      verdict="yes"; label="مناسب بررسی"; final="در پنجره زمانی و MC. تأیید دستی لازم است.";
+    } else {
+      verdict="maybe"; label="مردد"; final="عمر و MC خوب؛ زون اصلاح کامل نیست.";
+    }
+  } else if(passAge){
+    verdict="maybe"; label="مردد — MC کم"; final="داخل ۴۰ دقیقه‌ است ولی مارکت‌کپ زیر حد توست.";
+  } else {
+    verdict="no"; label="رد — عمر"; final="خارج از پنجره زمانی اسکالپ.";
+  }
+  return {items,verdict,label,final,plan};
+}
+
+async function loadPump(){
+  const seen=new Set(), out=[];
+  const qs=[
+    "limit=50&offset=0&sort=created_timestamp&order=DESC&includeNsfw=false",
+    "limit=50&offset=0&sort=last_trade_timestamp&order=DESC&includeNsfw=false",
+    "limit=50&offset=50&sort=created_timestamp&order=DESC&includeNsfw=false"
+  ];
+  for(const q of qs){
+    const r=await fetch(`${PUMP}/coins?${q}`);
+    if(!r.ok) throw new Error("pump HTTP "+r.status);
+    const data=await r.json();
+    if(!Array.isArray(data)) throw new Error("pump bad json");
+    for(const c of data){
+      if(!c.mint||seen.has(c.mint)) continue;
+      seen.add(c.mint); out.push(mapPump(c));
+    }
+  }
+  return out;
+}
+async function loadDex(){
+  const seen=new Set(), out=[];
+  for(const q of ["pump","sol","bonk","meme"]){
+    try{
+      const r=await fetch(`${DEX}/latest/dex/search?q=${encodeURIComponent(q)}`);
+      if(!r.ok) continue;
+      const data=await r.json();
+      for(const p of data.pairs||[]){
+        if(p.chainId!=="solana"||seen.has(p.pairAddress)) continue;
+        seen.add(p.pairAddress);
+        out.push(mapDex(p));
+      }
+    }catch{}
+  }
+  try{
+    const r=await fetch(`${DEX}/token-profiles/latest/v1`);
+    const profiles=await r.json();
+    for(const pr of (Array.isArray(profiles)?profiles:[]).filter(x=>x.chainId==="solana").slice(0,20)){
+      try{
+        const d=await fetch(`${DEX}/latest/dex/tokens/${pr.tokenAddress}`);
+        const pairs=((await d.json()).pairs||[]).filter(p=>p.chainId==="solana");
+        pairs.sort((a,b)=>(b.liquidity?.usd||0)-(a.liquidity?.usd||0));
+        if(pairs[0]&&!seen.has(pairs[0].pairAddress)){seen.add(pairs[0].pairAddress);out.push(mapDex(pairs[0]))}
+      }catch{}
+    }
+  }catch{}
+  return out;
+}
+
+function renderWallets(){
+  const box=$("walBox");
+  if(!wallets.length){box.innerHTML=`<div class="empty" style="padding:10px">خالی</div>`;return}
+  box.innerHTML=wallets.map((w,i)=>`<div class="wallet-item"><div><b>${w.label}</b><div style="font-size:.65rem;color:var(--c)">${w.addr.slice(0,4)}…${w.addr.slice(-4)}</div></div>
+    <div><a href="https://solscan.io/account/${w.addr}" target="_blank" style="color:var(--c);font-size:.7rem">Solscan</a>
+    <button data-i="${i}" style="border:none;background:none;color:var(--r);cursor:pointer">×</button></div></div>`).join("");
+  box.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{wallets.splice(+b.dataset.i,1);localStorage.setItem("drf_wallets",JSON.stringify(wallets));renderWallets()});
+}
+$("btnAddWal").onclick=()=>{
+  const addr=$("walIn").value.trim(), label=$("walLabel").value.trim()||"trader";
+  if(addr.length<32) return alert("آدرس نامعتبر");
+  wallets.push({addr,label}); localStorage.setItem("drf_wallets",JSON.stringify(wallets));
+  $("walIn").value="";$("walLabel").value=""; renderWallets();
+};
+
+function render(){
+  const cf=cfg();
+  const conf=getConfirms();
+  let list=rows.map(c=>{
+    const d=decide(c,cf);
+    const man=conf[c.mint]||{};
+    let {verdict,label,final,plan}=d, css=verdict;
+    if(verdict==="yes"&&man.community&&man.bundle){
+      css="yes yes-final"; label="بله نهایی"; final="تأیید دستی کامل — با پلان وارد شو.";
+    }
+    return {...c,...d,verdict,label,final,plan,css,communityOk:!!man.community,bundleOk:!!man.bundle};
+  });
+  const nYes=list.filter(c=>c.verdict==="yes").length;
+  const nMaybe=list.filter(c=>c.verdict==="maybe").length;
+  const nNo=list.filter(c=>c.verdict==="no").length;
+  $("nRaw").textContent=list.length; $("nYes").textContent=nYes; $("nMaybe").textContent=nMaybe; $("nNo").textContent=nNo;
+
+  if(cf.showMode==="soft") list=list.filter(c=>c.verdict!=="no");
+  if(cf.showMode==="strict") list=list.filter(c=>c.verdict==="yes");
+  if(filter!=="all") list=list.filter(c=>c.verdict===filter);
+  list.sort((a,b)=>{const o={yes:0,maybe:1,no:2};return o[a.verdict]-o[b.verdict]||a.ageMin-b.ageMin});
+
+  const box=$("list");
+  if(!list.length){
+    box.innerHTML=`<div class="empty">چیزی برای نمایش نیست.<br>تب «همه» یا «رد» را ببین · مارکت‌کپ را پایین‌تر بیاور · یا حداکثر عمر را بیشتر کن.</div>`;
+    return;
+  }
+  box.innerHTML=list.map(c=>`
+    <div class="item ${c.css}">
+      <div class="top">
+        <div class="name">${c.image?`<img src="${c.image}" onerror="this.remove()">`:""}${c.symbol}
+          <span class="tag">${c.src}</span>
+        </div>
+        <span class="verdict ${c.css.includes("yes-final")?"yes-final":c.verdict}">${c.label}</span>
+      </div>
+      <div style="font-size:.74rem;color:var(--muted)">${c.name}</div>
+      <div class="metrics">
+        <div class="m"><div class="l">MC</div><div class="v">$${fmt(c.usd)}</div></div>
+        <div class="m"><div class="l">افت</div><div class="v">${c.dip?c.dip.toFixed(0)+"%":"—"}</div></div>
+        <div class="m"><div class="l">عمر</div><div class="v">${c.ageMin}m</div></div>
+        <div class="m"><div class="l">منبع</div><div class="v">${c.src}</div></div>
+      </div>
+      <div>${c.items.map(i=>`<div class="cl ${i.manual?"manual":i.pass?"pass":"fail"}">${i.manual?"؟":i.pass?"✓":"✗"} ${i.text}</div>`).join("")}</div>
+      <div class="plan">${c.plan}</div>
+      ${c.verdict==="yes"?`<div class="manual-box">
+        <label><input type="checkbox" data-m="${c.mint}" data-k="community" ${c.communityOk?"checked":""}> جامعه</label>
+        <label><input type="checkbox" data-m="${c.mint}" data-k="bundle" ${c.bundleOk?"checked":""}> ضدباندل</label>
+      </div>`:""}
+      <div class="final ${c.css.includes("yes-final")?"yes-final":c.verdict}">${c.final}</div>
+      <div class="actions">
+        <a href="${c.url}" target="_blank" rel="noopener">${c.src==="pump"?"Pump":"Open"}</a>
+        <a href="${c.dex}" target="_blank" rel="noopener">Dex</a>
+        <a href="https://solscan.io/token/${c.mint}#holders" target="_blank" rel="noopener">هولدر</a>
+        ${c.creator?`<a href="https://solscan.io/account/${c.creator}" target="_blank" rel="noopener">Dev</a>`:""}
+        <button type="button" data-ca="${c.mint||""}">CA</button>
+      </div>
+    </div>`).join("");
+  box.querySelectorAll("[data-ca]").forEach(b=>b.onclick=()=>{if(b.dataset.ca)navigator.clipboard.writeText(b.dataset.ca)});
+  box.querySelectorAll(".manual-box input").forEach(inp=>inp.onchange=()=>{setConfirm(inp.dataset.m,inp.dataset.k,inp.checked);render()});
+}
+
+async function scan(){
+  if(scanning)return; scanning=true; $("btnScan").disabled=true;
+  $("status").textContent="در حال دریافت…";
+  $("apiAlert").style.display="none";
+  try{
+    let raw=[], msg="";
+    try{
+      raw=await loadPump();
+      source="Pump.fun";
+      $("srcBadge").textContent="منبع: Pump.fun واقعی";
+      $("srcBadge").classList.remove("warn");
+    }catch(e){
+      msg="Pump.fun از مرورگر بلاک شد (CORS/Cloudflare). سوییچ به DexScreener…";
+      $("apiAlert").style.display="block";
+      $("apiAlert").textContent=msg+" — "+e.message;
+      raw=await loadDex();
+      source="DexScreener";
+      $("srcBadge").textContent="منبع: DexScreener (fallback)";
+      $("srcBadge").classList.add("warn");
+    }
+    const cf=cfg();
+    // keep young-ish for UI
+    rows=raw.filter(c=>c.ageMin<=Math.max(cf.maxAgeMin*3,120));
+    $("status").textContent=`${rows.length} کوین از ${source} · ${new Date().toLocaleTimeString("fa-IR")}`;
+    render();
+    if(!rows.length) $("list").innerHTML=`<div class="empty">داده آمد ولی بعد از فیلتر عمر چیزی نماند. حداکثر عمر را بالا ببر.</div>`;
+  }catch(e){
+    $("status").textContent="خطا";
+    $("list").innerHTML=`<div class="empty">خطا: ${e.message}</div>`;
+  }finally{scanning=false;$("btnScan").disabled=false}
+}
+function toggleAuto(){
+  auto=!auto;
+  $("btnAuto").textContent=auto?"اتواسکن: روشن":"اتواسکن: خاموش";
+  clearInterval(autoTimer);
+  if(auto){autoTimer=setInterval(scan,60000);scan()}
+}
+$("btnScan").onclick=scan; $("btnAuto").onclick=toggleAuto;
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));t.classList.add("on");filter=t.dataset.f;render()});
+["minMcap","minAgeMin","maxAgeMin","minDip","maxDip","showMode","stopLoss","timeStop","tp1","tp2"].forEach(id=>{const el=$(id);if(el)el.onchange=()=>rows.length&&render()});
+renderWallets();
+setTimeout(scan,400);
+</script>
+</body>
+</html>
