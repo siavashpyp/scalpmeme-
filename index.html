@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pump.fun Only · Decision Radar</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06080f;--card:#0c1220;--card2:#111827;--line:rgba(255,255,255,.08);--text:#f8fafc;--muted:#94a3b8;--dim:#64748b;--g:#22c55e;--r:#ef4444;--y:#eab308;--c:#22d3ee}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Vazirmatn,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.wrap{max-width:1000px;margin:0 auto;padding:14px}
+.head{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--card);margin-bottom:12px}
+h1{font-size:1.1rem;font-weight:900}
+.sub{font-size:.75rem;color:var(--muted)}
+.badge{display:inline-block;margin-top:4px;font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:8px;background:rgba(34,211,238,.12);color:var(--c)}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer;font-family:inherit}
+.btn-main{background:#22c55e;color:#041016}
+.btn-ghost{background:var(--card2);border:1px solid var(--line);color:var(--text)}
+.btn:disabled{opacity:.5}
+.grid{display:grid;grid-template-columns:270px 1fr;gap:12px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.panel h2{font-size:.85rem;margin-bottom:8px}
+.field{margin-bottom:8px}
+.field label{display:block;font-size:.68rem;color:var(--muted);font-weight:700;margin-bottom:3px}
+.field input,.field select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;color:var(--text);font-family:inherit}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.stat{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.stat .n{font-weight:900;font-family:JetBrains Mono,monospace}
+.stat .l{font-size:.65rem;color:var(--muted)}
+.item{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.item.yes{border-color:rgba(34,197,94,.45)}
+.item.maybe{border-color:rgba(234,179,8,.35)}
+.top{display:flex;justify-content:space-between;gap:8px}
+.name{font-weight:900}
+.verdict{font-size:.7rem;font-weight:900;padding:3px 8px;border-radius:99px}
+.verdict.yes{background:rgba(34,197,94,.15);color:var(--g)}
+.verdict.maybe{background:rgba(234,179,8,.15);color:var(--y)}
+.verdict.no{background:rgba(239,68,68,.12);color:var(--r)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:8px 0}
+.m{background:rgba(0,0,0,.25);border-radius:8px;padding:6px;text-align:center}
+.m .l{font-size:.58rem;color:var(--dim)}.m .v{font-size:.75rem;font-weight:800;font-family:JetBrains Mono,monospace}
+.cl{font-size:.72rem;color:var(--muted);margin:2px 0}.cl.ok{color:var(--g)}.cl.bad{color:var(--r)}
+.actions a,.actions button{display:inline-block;margin:4px 4px 0 0;padding:5px 8px;border-radius:7px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--text);text-decoration:none;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit}
+.empty{text-align:center;padding:24px;color:var(--dim)}
+.status,.note{font-size:.75rem;color:var(--muted);margin-bottom:8px}
+.alert{display:none;padding:10px;border-radius:10px;background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.3);color:var(--y);font-size:.78rem;margin-bottom:10px}
+.tag{font-size:.62rem;font-weight:800;padding:2px 6px;border-radius:5px;background:rgba(34,211,238,.12);color:var(--c)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Pump.fun Only</h1>
+      <div class="sub">فقط توکن‌های Pump.fun · فیلتر اسکالپ تو</div>
+      <span class="badge" id="src">منبع: —</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" id="btnAuto">اتو: خاموش</button>
+      <button class="btn btn-main" id="btnScan">اسکن Pump</button>
+    </div>
+  </div>
+  <div class="grid">
+    <aside>
+      <div class="panel">
+        <h2>فیلتر Pump</h2>
+        <div class="field"><label>وضعیت منحنی</label>
+          <select id="curve">
+            <option value="active">فقط روی منحنی (complete=false)</option>
+            <option value="all">همه Pump (منحنی + فارغ‌شده)</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field"><label>حداقل عمر (دقیقه)</label><input id="minAge" type="number" value="0"></div>
+          <div class="field"><label>حداکثر عمر (دقیقه)</label><input id="maxAge" type="number" value="40"></div>
+        </div>
+        <div class="field"><label>حداقل مارکت‌کپ $</label><input id="minMc" type="number" value="1000"></div>
+        <div class="field"><label>نمایش</label>
+          <select id="view">
+            <option value="window">داخل پنجره عمر</option>
+            <option value="yes">فقط مناسب</option>
+            <option value="all">همه Pump دریافتی</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field"><label>SOL</label><input id="sol" type="number" value="0.1" step="0.01"></div>
+          <div class="field"><label>٪ ورود</label><input id="risk" type="number" value="50"></div>
+        </div>
+        <div class="note" id="pos">سقف: 0.05 SOL</div>
+        <div class="note" style="margin-top:8px">
+          تعریف Pump در این ابزار:<br>
+          ۱) داده مستقیم API پمپ<br>
+          ۲) یا mint که به <b>pump</b> ختم شود (استاندارد Pump.fun)
+        </div>
+      </div>
+    </aside>
+    <main>
+      <div class="alert" id="alert"></div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="sRaw">0</div><div class="l">Pump خام</div></div>
+        <div class="stat"><div class="n" id="sWin" style="color:var(--c)">0</div><div class="l">پنجره عمر</div></div>
+        <div class="stat"><div class="n" id="sYes" style="color:var(--g)">0</div><div class="l">مناسب</div></div>
+        <div class="stat"><div class="n" id="sShow">0</div><div class="l">نمایش</div></div>
+      </div>
+      <div class="status" id="status">آماده</div>
+      <div id="list"><div class="empty">اسکن Pump را بزن</div></div>
+    </main>
+  </div>
+</div>
+<script>
+const PUMP="https://frontend-api-v3.pump.fun";
+const DEX="https://api.dexscreener.com";
+let rows=[], scanning=false, auto=false, timer=null;
+const $=id=>document.getElementById(id);
+function fmt(n){if(n==null||isNaN(n)||!n)return"—";if(n>=1e9)return(n/1e9).toFixed(2)+"B";if(n>=1e6)return(n/1e6).toFixed(2)+"M";if(n>=1e3)return(n/1e3).toFixed(1)+"K";return Math.round(n)+""}
+function cfg(){return{minAge:+$("minAge").value||0,maxAge:+$("maxAge").value||40,minMc:+$("minMc").value||1000,curve:$("curve").value,view:$("view").value}}
+function updatePos(){const s=+$("sol").value||0,r=(+$("risk").value||50)/100;$("pos").textContent="سقف: "+(s*r).toFixed(3)+" SOL"}
+$("sol").oninput=$("risk").oninput=updatePos;updatePos();
+function isPumpMint(addr){return typeof addr==="string" && addr.toLowerCase().endsWith("pump")}
+async function jget(url){
+  const r=await fetch(url,{headers:{Accept:"application/json"}});
+  if(!r.ok) throw new Error(r.status+" "+url.split("?")[0]);
+  return r.json();
+}
+
+function fromPump(c){
+  const usd=Number(c.usd_market_cap||c.market_cap_usd||0);
+  const ath=Number(c.ath_market_cap||0);
+  let dip=0; if(ath>0&&usd>0&&ath>=usd) dip=((ath-usd)/ath)*100;
+  const ageMin=c.created_timestamp?Math.max(0,Math.floor((Date.now()-c.created_timestamp)/60000)):99999;
+  return{
+    mint:c.mint, symbol:(c.symbol||"?").toUpperCase(), name:c.name||"?", image:c.image_uri||null,
+    usd, ath, dip, ageMin, complete:!!c.complete, creator:c.creator||"",
+    url:`https://pump.fun/coin/${c.mint}`, src:"pump-api", onCurve:!c.complete
+  };
+}
+function fromDexPair(p){
+  const b=p.baseToken||{};
+  if(!isPumpMint(b.address)) return null;
+  const usd=Number(p.marketCap||p.fdv||0);
+  const chg24=parseFloat(p.priceChange?.h24)||0, chg6=parseFloat(p.priceChange?.h6)||0;
+  let dip=0; if(chg24<0)dip=Math.max(dip,Math.abs(chg24)); if(chg6<0)dip=Math.max(dip,Math.abs(chg6));
+  const ageMin=p.pairCreatedAt?Math.max(0,Math.floor((Date.now()-p.pairCreatedAt)/60000)):99999;
+  return{
+    mint:b.address, symbol:(b.symbol||"?").toUpperCase(), name:b.name||"?", image:p.info?.imageUrl||null,
+    usd, ath:0, dip, ageMin, complete:false, creator:"",
+    url:`https://pump.fun/coin/${b.address}`, src:"dex-pump-mint", onCurve:true,
+    liq:Number(p.liquidity?.usd||0)
+  };
+}
+
+async function loadPumpApi(){
+  const seen=new Set(), out=[];
+  const qs=[
+    "limit=50&offset=0&sort=created_timestamp&order=DESC&includeNsfw=false",
+    "limit=50&offset=0&sort=last_trade_timestamp&order=DESC&includeNsfw=false",
+    "limit=50&offset=50&sort=created_timestamp&order=DESC&includeNsfw=false"
+  ];
+  for(const q of qs){
+    const data=await jget(`${PUMP}/coins?${q}`);
+    if(!Array.isArray(data)) throw new Error("bad pump payload");
+    for(const c of data){
+      if(!c.mint||seen.has(c.mint)) continue;
+      // enforce pump mint style when present
+      if(c.mint && !isPumpMint(c.mint) && !String(c.program||"").includes("pump")) {
+        // still allow - official API is pump by definition
+      }
+      seen.add(c.mint);
+      out.push(fromPump(c));
+    }
+  }
+  return out;
+}
+
+async function loadDexPumpOnly(){
+  const seen=new Set(), out=[];
+  async function addFromToken(addr){
+    if(!isPumpMint(addr) || seen.has(addr)) return;
+    try{
+      const data=await jget(`${DEX}/latest/dex/tokens/${addr}`);
+      const pairs=(data.pairs||[]).filter(p=>p.chainId==="solana");
+      pairs.sort((a,c)=>((c.liquidity?.usd||0)-(a.liquidity?.usd||0)));
+      if(!pairs[0]) return;
+      const m=fromDexPair(pairs[0]);
+      if(!m) return;
+      seen.add(addr); out.push(m);
+    }catch{}
+  }
+  for(const ep of ["/token-boosts/latest/v1","/token-boosts/top/v1"]){
+    try{
+      const boosts=await jget(DEX+ep);
+      for(const b of (Array.isArray(boosts)?boosts:[]).filter(x=>x.chainId==="solana")){
+        await addFromToken(b.tokenAddress);
+      }
+    }catch{}
+  }
+  try{
+    const profiles=await jget(DEX+"/token-profiles/latest/v1");
+    for(const pr of (Array.isArray(profiles)?profiles:[]).filter(x=>x.chainId==="solana")){
+      await addFromToken(pr.tokenAddress);
+    }
+  }catch{}
+  return out;
+}
+
+function score(c,cf){
+  const passAge=c.ageMin>=cf.minAge && c.ageMin<=cf.maxAge;
+  const passMc=c.usd>=cf.minMc;
+  const passCurve=cf.curve==="all" ? true : !!c.onCurve;
+  const items=[
+    {ok:true,t:"منبع Pump.fun / mint ...pump"},
+    {ok:passAge,t:`عمر ${c.ageMin}د (حداکثر ${cf.maxAge})`},
+    {ok:passMc,t:`MC $${fmt(c.usd)}`},
+    {ok:passCurve,t:c.onCurve?"روی منحنی Pump":"فارغ‌شده از منحنی"},
+  ];
+  let verdict="no", label="رد";
+  if(passAge&&passMc&&passCurve){verdict="yes";label="مناسب بررسی"}
+  else if(passAge&&passCurve){verdict="maybe";label="مردد — MC"}
+  else if(!passAge){verdict="no";label="رد — عمر"}
+  else {verdict="no";label="رد"}
+  return {items,verdict,label,passAge};
+}
+
+function render(){
+  const cf=cfg();
+  let list=rows.map(c=>({...c,...score(c,cf)}));
+  if(cf.curve==="active") list=list.filter(c=>c.onCurve);
+  $("sRaw").textContent=list.length;
+  const win=list.filter(c=>c.passAge).length;
+  $("sWin").textContent=win;
+  $("sYes").textContent=list.filter(c=>c.verdict==="yes").length;
+  if(cf.view==="window") list=list.filter(c=>c.passAge);
+  if(cf.view==="yes") list=list.filter(c=>c.verdict==="yes");
+  list.sort((a,b)=>{const o={yes:0,maybe:1,no:2};return o[a.verdict]-o[b.verdict]||a.ageMin-b.ageMin});
+  $("sShow").textContent=list.length;
+  const box=$("list");
+  if(!list.length){
+    box.innerHTML=`<div class="empty">هیچ توکن Pump برای نمایش نیست.<br>خام: ${rows.length} · پنجره عمر: ${win}<br>حداکثر عمر را 120 یا MC را 500 امتحان کن.</div>`;
+    return;
+  }
+  box.innerHTML=list.map(c=>`
+    <div class="item ${c.verdict}">
+      <div class="top">
+        <div class="name">${c.symbol} <span class="tag">PUMP</span></div>
+        <span class="verdict ${c.verdict}">${c.label}</span>
+      </div>
+      <div style="font-size:.75rem;color:var(--muted)">${c.name}</div>
+      <div class="metrics">
+        <div class="m"><div class="l">MC</div><div class="v">$${fmt(c.usd)}</div></div>
+        <div class="m"><div class="l">عمر</div><div class="v">${c.ageMin}m</div></div>
+        <div class="m"><div class="l">افت</div><div class="v">${c.dip?c.dip.toFixed(0)+'%':'—'}</div></div>
+        <div class="m"><div class="l">منبع</div><div class="v" style="font-size:.65rem">${c.src}</div></div>
+      </div>
+      ${c.items.map(i=>`<div class="cl ${i.ok?'ok':'bad'}">${i.ok?'✓':'✗'} ${i.t}</div>`).join("")}
+      <div class="cl">سقف ورود: ${$("pos").textContent.replace("سقف: ","")}</div>
+      <div class="actions">
+        <a href="${c.url}" target="_blank" rel="noopener">Pump.fun</a>
+        <a href="https://dexscreener.com/solana/${c.mint}" target="_blank" rel="noopener">Dex</a>
+        <a href="https://solscan.io/token/${c.mint}#holders" target="_blank" rel="noopener">هولدر</a>
+        ${c.creator?`<a href="https://solscan.io/account/${c.creator}" target="_blank" rel="noopener">Dev</a>`:""}
+        <button type="button" data-ca="${c.mint}">CA</button>
+      </div>
+    </div>`).join("");
+  box.querySelectorAll("[data-ca]").forEach(b=>b.onclick=()=>navigator.clipboard.writeText(b.dataset.ca));
+}
+
+async function scan(){
+  if(scanning)return; scanning=true; $("btnScan").disabled=true;
+  $("status").textContent="فقط Pump.fun…"; $("alert").style.display="none";
+  try{
+    let raw=[], src="";
+    try{
+      raw=await loadPumpApi();
+      src="Pump.fun API";
+      $("src").textContent="منبع: API رسمی/فرانت Pump.fun";
+    }catch(e){
+      $("alert").style.display="block";
+      $("alert").textContent="API پمپ از مرورگر بسته است. فقط mintهایی که به pump ختم می‌شوند از Dex لود می‌شوند. ("+e.message+")";
+      raw=await loadDexPumpOnly();
+      src="Dex (mint …pump)";
+      $("src").textContent="منبع: DexScreener · فقط mintهای …pump";
+    }
+    // hard pump filter again
+    rows=raw.filter(c=>c.src==="pump-api" || isPumpMint(c.mint));
+    $("status").textContent=`${src} · ${rows.length} توکن Pump · ${new Date().toLocaleTimeString("fa-IR")}`;
+    render();
+  }catch(e){
+    $("list").innerHTML=`<div class="empty">خطا: ${e.message}</div>`;
+    $("status").textContent="خطا";
+  }finally{scanning=false;$("btnScan").disabled=false}
+}
+$("btnScan").onclick=scan;
+$("btnAuto").onclick=()=>{auto=!auto;$("btnAuto").textContent=auto?"اتو: روشن":"اتو: خاموش";clearInterval(timer);if(auto){timer=setInterval(scan,45000);scan()}};
+["minAge","maxAge","minMc","curve","view"].forEach(id=>$(id).onchange=()=>rows.length&&render());
+setTimeout(scan,300);
+</script>
+</body>
+</html>
